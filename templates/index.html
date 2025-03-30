@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hartenjagen Scorebord</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .game-status {
+            margin: 20px 0;
+            padding: 10px;
+            background-color: #e8f5e9;
+            border-radius: 4px;
+        }
+        .error {
+            color: #d32f2f;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #ffebee;
+            border-radius: 4px;
+        }
+        .player-form {
+            margin: 20px 0;
+        }
+        .score-form {
+            margin: 20px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f5f5f5;
+        }
+        input[type="text"], input[type="number"] {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .reset-button {
+            background-color: #f44336;
+        }
+        .reset-button:hover {
+            background-color: #da190b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Hartenjagen Scorebord</h1>
+        
+        {% if error %}
+        <div class="error">{{ error }}</div>
+        {% endif %}
+
+        <div class="game-status">
+            <p>Ronde: {{ game.ronde }}</p>
+            <p>Fase: {{ game.game_phase }}</p>
+            {% if game.game_over %}
+            <p>Spel afgelopen! Winnaar: {{ game.winner }}</p>
+            {% endif %}
+        </div>
+
+        {% if not game.is_spel_vol %}
+        <div class="player-form">
+            <h2>Voeg speler toe</h2>
+            <form action="{{ url_for('voeg_speler_toe') }}" method="post">
+                <input type="text" name="naam" placeholder="Naam speler" required>
+                <button type="submit">Toevoegen</button>
+            </form>
+        </div>
+        {% endif %}
+
+        {% if game.spelers %}
+        <div class="score-form">
+            <h2>Voer scores in</h2>
+            <form action="{{ url_for('voer_score_in') }}" method="post">
+                <table>
+                    <tr>
+                        <th>Speler</th>
+                        <th>Score</th>
+                    </tr>
+                    {% for speler in game.spelers %}
+                    <tr>
+                        <td>{{ speler }}</td>
+                        <td>
+                            <input type="number" name="score_{{ speler }}" required>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                <button type="submit">Scores opslaan</button>
+            </form>
+        </div>
+
+        <h2>Huidige stand</h2>
+        <table>
+            <tr>
+                <th>Speler</th>
+                <th>Totale score</th>
+            </tr>
+            {% for speler, score in game.scores.items() %}
+            <tr>
+                <td>{{ speler }}</td>
+                <td>{{ score }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% endif %}
+
+        <div style="margin-top: 20px;">
+            <a href="{{ url_for('reset') }}">
+                <button class="reset-button">Nieuw spel</button>
+            </a>
+        </div>
+    </div>
+</body>
+</html> 
